@@ -39,7 +39,7 @@ export default class Trigger {
         console.log(data);
         try {
             console.log(data.price);
-            await this.optionsContract.methods.closeTrade(id, data.price, data.sig).send({from: this.walletAddress, gas: this.gasAmount, gasPrice: this.gasPrice, nonce: this.nonce})
+            await this.optionsContract.methods.closeTrade(id, data.price, data.sig).send({from: this.walletAddress, gas: this.gasAmount, nonce: this.nonce})
             .on('transactionHash', function(hash){
                 console.log("`Hash: `"+hash);
             })
