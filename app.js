@@ -9,7 +9,7 @@ class App {
 
     constructor() {
         if(process.env.WORK == 1) { 
-            this.numberOfAssets = 1;
+            this.numberOfAssets = 40;
             this.oraclePrices = new COraclePrices(this.numberOfAssets);
             this.onchain = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
             this.onchainArbi = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
@@ -76,6 +76,7 @@ class App {
 
         for(let i=0; i<this.openPositions.length; i++) { //this.openPositions.length
             if(this.triggered[this.openPositions[i].network].includes(this.openPositions[i].id)) continue;
+            if(this.openPositions[i].orderType != 0) continue;
 
             const asset = this.openPositions[i].asset;
             if(!sigData[asset]) continue;

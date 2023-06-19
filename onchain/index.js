@@ -12,7 +12,7 @@ export default class Onchain {
         const web3 = new Web3(new Web3.providers.HttpProvider(provider));
 
         this.tradenftContract = new web3.eth.Contract(tradenftABI, this.tradenftAddress);
-        this.numberOfAssets = 1;
+        this.numberOfAssets = 40;
     }
 
     async updatePositionsAndIds() {
@@ -39,7 +39,9 @@ export default class Onchain {
         let tradesPromise = [];
     
         for(var i=0; i<this.allIds.length; i++) {
-            tradesPromise.push(this.tradenftContract.methods.trades(this.allIds[i]).call());
+            try {
+                tradesPromise.push(this.tradenftContract.methods.trades(this.allIds[i]).call());
+            } catch(e) {}
         }
 
         await Promise.all(tradesPromise).then(async s => {
@@ -53,9 +55,9 @@ export default class Onchain {
 
     setAddresses(network) {
         if(network == 0) {
-            this.tradenftAddress = "0x9327134B588530887C2730216564c9c408310Bcc";
+            this.tradenftAddress = "0xE7F1cE809EeEb35D0081ea29e39Be57ccF451a6b";
         } else {
-            this.tradenftAddress = "0x9327134B588530887C2730216564c9c408310Bcc";
+            this.tradenftAddress = "0xE7F1cE809EeEb35D0081ea29e39Be57ccF451a6b";
         }
     }
 }
