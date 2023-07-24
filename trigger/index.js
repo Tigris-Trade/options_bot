@@ -55,9 +55,9 @@ export default class Trigger {
 
     async init(network) {
         if(network == 0) {
-            this.optionsAddress = "0x2BFf45c93C39ab5D31Bb01300E2dd6EEf59836bC";
+            this.optionsAddress = "0x72cCBECE3F4cB0aF63865240F240496BC5E4351d";
         } else {
-            this.optionsAddress = "0x2BFf45c93C39ab5D31Bb01300E2dd6EEf59836bC";
+            this.optionsAddress = "0x72cCBECE3F4cB0aF63865240F240496BC5E4351d";
         }
 
         this.optionsContract = new ethers.Contract(this.optionsAddress, this.optionsABI, this.signer);
