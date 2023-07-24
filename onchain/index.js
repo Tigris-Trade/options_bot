@@ -55,9 +55,9 @@ export default class Onchain {
 
     setAddresses(network) {
         if(network == 0) {
-            this.tradenftAddress = "0xE7F1cE809EeEb35D0081ea29e39Be57ccF451a6b";
+            this.tradenftAddress = "0x7B7ce91d7d69f49D86FCA80B034c6A103837CbB8";
         } else {
-            this.tradenftAddress = "0xE7F1cE809EeEb35D0081ea29e39Be57ccF451a6b";
+            this.tradenftAddress = "0x7B7ce91d7d69f49D86FCA80B034c6A103837CbB8";
         }
     }
 }
