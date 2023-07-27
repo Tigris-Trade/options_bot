@@ -81,7 +81,7 @@ class App {
             const asset = this.openPositions[i].asset;
             if(!sigData[asset]) continue;
 
-            const timeNow = new Date().getTime() / 1000;
+            const timeNow = sigData[asset].price[5];
             const expires = this.openPositions[i].expires;
 
             console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires);
