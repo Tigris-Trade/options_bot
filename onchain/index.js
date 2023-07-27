@@ -40,7 +40,11 @@ export default class Onchain {
     
         for(var i=0; i<this.allIds.length; i++) {
             try {
-                tradesPromise.push(this.tradenftContract.methods.trades(this.allIds[i]).call());
+                let x;
+                try {
+                    x = await this.tradenftContract.methods.trades(this.allIds[i]).call();
+                    tradesPromise.push(x);
+                } catch(e) {}
             } catch(e) {}
         }
 
