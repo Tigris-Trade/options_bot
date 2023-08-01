@@ -30,6 +30,9 @@ export default class Trigger {
         if(type == 0) {
             await this.closeTrade(nftId, data);
             this.updateNonce();
+        } else if(type == 1) {
+            await this.executeLimit(nftId, data);
+            this.updateNonce();
         }
     }
 
@@ -37,18 +40,18 @@ export default class Trigger {
         console.log(data);
         try {
             await this.optionsContract.closeTrade(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount})
-            // .on('transactionHash', function(hash){
-            //     console.log("`Hash: `"+hash);
-            // })
-            // .on('receipt', function(receipt){
-            //     console.log("Close Handled");
-            // })
-            // .on('error', function(error, receipt) {
-            //     console.log(error);
-            //     console.log(receipt);
-            // });
         } catch(error) {
             console.log("close catch");
+            console.log(error);
+        }
+    }
+
+    async executeLimit(id, data) {
+        console.log(data);
+        try {
+            await this.optionsContract.executeLimitOrder(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount})
+        } catch(error) {
+            console.log("execute catch");
             console.log(error);
         }
     }

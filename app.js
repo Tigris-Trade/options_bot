@@ -9,7 +9,7 @@ class App {
 
     constructor() {
         if(process.env.WORK == 1) { 
-            this.numberOfAssets = 40;
+            this.numberOfAssets = 45;
             this.oraclePrices = new COraclePrices(this.numberOfAssets);
             this.onchain = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
             this.onchainArbi = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
@@ -76,22 +76,35 @@ class App {
 
         for(let i=0; i<this.openPositions.length; i++) { //this.openPositions.length
             if(this.triggered[this.openPositions[i].network].includes(this.openPositions[i].id)) continue;
-            if(this.openPositions[i].orderType != 0) continue;
 
             const asset = this.openPositions[i].asset;
             if(!sigData[asset]) continue;
 
-            const timeNow = sigData[asset].price[5];
-            const expires = this.openPositions[i].expires;
+            if(this.openPositions[i].orderType == 0) {
+                const timeNow = sigData[asset].price[5];
+                const expires = this.openPositions[i].expires;
 
-            console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires);
+                console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires);
 
-            if(timeNow >= expires) {
-                this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
+                if(timeNow >= expires) {
+                    this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
-                console.log("triggering #"+this.openPositions[i].id);
-                this.handleTrigger(this.openPositions[i], sigData[asset], 0);
-                break;
+                    console.log("triggering #"+this.openPositions[i].id);
+                    this.handleTrigger(this.openPositions[i], sigData[asset], 0);
+                    break;
+                }
+            } else if(this.openPositions[i].orderType == 1) {
+                const openPrice = this.openPositions[i].openPrice;
+                const isLong = this.openPositions[i].direction;
+                const currentPrice = prices[this.openPositions[i].asset];
+
+                console.log(openPrice, currentPrice, isLong);
+                if((isLong && openPrice >= currentPrice) || (!isLong && openPrice <= currentPrice)) {
+                    this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
+
+                    console.log("triggering limit #"+this.openPositions[i].id);
+                    this.handleTrigger(this.openPositions[i], sigData[asset], 1);
+                } 
             }
         }
     }
