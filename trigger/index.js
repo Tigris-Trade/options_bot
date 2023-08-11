@@ -15,9 +15,9 @@ export default class Trigger {
         this.gasAmount = 1000000;
 
         if(network == 0) {
-            this.gasPrice = 1000 * 1000000000;
+            this.gasPrice = 250 * 1000000000;
         } else {
-            this.gasPrice = 1000 * 1000000000;
+            this.gasPrice = 250 * 1000000000;
         }
 
         this.init(network);
@@ -66,9 +66,14 @@ export default class Trigger {
         ).then(async (nonce) => {
             this.nonce = nonce;
         });
+
+        setInterval(() => {
+            this.updateNonce();
+        }, 30*1000);
     }
 
     async updateNonce() {
+        console.log("Nonce updated");
         this.nonce = await this.web3.eth.getTransactionCount(
             this.walletAddress,
             "pending"
