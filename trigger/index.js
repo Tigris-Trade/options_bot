@@ -26,20 +26,16 @@ export default class Trigger {
     async trig(type, nftId, data) {
 
         console.log(type, "trigging....");
-        await this.updateNonce();
         if(type == 0) {
             await this.closeTrade(nftId, data);
-            this.updateNonce();
         } else if(type == 1) {
             await this.executeLimit(nftId, data);
-            this.updateNonce();
         }
     }
 
     async closeTrade(id, data) {
-        console.log(data);
         try {
-            await this.optionsContract.closeTrade(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount})
+            await this.optionsContract.closeTrade(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
         } catch(error) {
             console.log("close catch");
             console.log(error);
@@ -47,9 +43,8 @@ export default class Trigger {
     }
 
     async executeLimit(id, data) {
-        console.log(data);
         try {
-            await this.optionsContract.executeLimitOrder(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount})
+            await this.optionsContract.executeLimitOrder(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
         } catch(error) {
             console.log("execute catch");
             console.log(error);

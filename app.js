@@ -3,6 +3,7 @@ import Onchain from './onchain/index.js';
 import COraclePrices from './COraclePrices/index.js';
 import Trigger from './trigger/index.js'
 import socketio from 'socket.io-client';
+import axios from 'axios';
 dotenv.config();
 
 class App {
@@ -84,9 +85,32 @@ class App {
                 const timeNow = sigData[asset].price[5];
                 const expires = this.openPositions[i].expires;
 
-                console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires);
+                console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires + 10 ? "Old" : timeNow >= expires ? "Normal" : "Not yet");
 
-                if(timeNow >= expires) {
+                if(expires < 1691752121 || expires == 1691753171) {
+                    this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
+                } else if(timeNow >= expires + 10) {
+                    this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
+
+                    console.log("triggering old #"+this.openPositions[i].id);
+                    const xoldSig = await axios.get(`https://db.tigrisoracle.net/pair/${asset}/${(expires/1)+1}`);
+                    const oldSig = xoldSig.data;
+
+                    const sig = {
+                        price: [
+                            oldSig.provider,
+                            oldSig.is_closed,
+                            oldSig.asset,
+                            oldSig.price,
+                            oldSig.spread,
+                            oldSig.timestamp
+                        ],
+                        sig: oldSig.signature
+                    }
+                    
+                    this.handleTrigger(this.openPositions[i], sig, 0);
+                    break;
+                } else if(timeNow >= expires) {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
                     console.log("triggering #"+this.openPositions[i].id);
