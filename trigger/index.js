@@ -15,9 +15,9 @@ export default class Trigger {
         this.gasAmount = 1000000;
 
         if(network == 0) {
-            this.gasPrice = 250 * 1000000000;
+            this.gasPrice = 500 * 1000000000;
         } else {
-            this.gasPrice = 250 * 1000000000;
+            this.gasPrice = 500 * 1000000000;
         }
 
         this.init(network);
