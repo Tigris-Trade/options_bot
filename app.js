@@ -12,10 +12,12 @@ class App {
         if(process.env.WORK == 1) { 
             this.numberOfAssets = 45;
             this.oraclePrices = new COraclePrices(this.numberOfAssets);
-            this.onchain = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
-            this.onchainArbi = new Onchain(process.env.PROVIDER_ARBI, 1, this.numberOfAssets);
-            //this.trigger = new Trigger(process.env.PROVIDER, 0, process.env.WALLET, process.env.PRIV_KEY);
-            this.triggerArbi = new Trigger(process.env.PROVIDER_ARBI, 1, process.env.WALLET, process.env.PRIV_KEY);
+            
+            this.onchain = new Onchain(process.env.PROVIDER_ARBI /* env on server is for polygon*/, 137, this.numberOfAssets);
+            this.onchainArbi = new Onchain("https://arb1.arbitrum.io/rpc", 42161, this.numberOfAssets);
+
+            this.trigger = new Trigger(process.env.PROVIDER_ARBI /* env on server is for polygon*/, 137, process.env.WALLET, process.env.PRIV_KEY);
+            this.triggerArbi = new Trigger("https://arb1.arbitrum.io/rpc", 42161, process.env.WALLET, process.env.PRIV_KEY);
 
             const socket = socketio(new Date().getTimezoneOffset() < -120 ? 'https://us1events.tigristrade.info' : 'https://eu1events.tigristrade.info', { transports: ['websocket'] });
 
@@ -24,23 +26,27 @@ class App {
             });
 
             socket.on('TradeOpened', (data) => {
-                this.update(false);
+                console.log(data.chainId);
+                this.update(false, data.chainId);
             });
 
             socket.on('TradeClosed', (data) => {
-                this.update(false);
+                this.update(false, data.chainId);
             });
 
             socket.on('LimitOrderExecuted', (data) => {
-                this.update(false);
+                this.update(false, data.chainId);
             });
 
             socket.on('LimitCancelled', (data) => {
-                this.update(false);
+                this.update(false, data.chainId);
             });
 
             this.openPositions = [];
-            this.triggered = [[], []];
+            this.triggered = {
+                137: [], 
+                42161: []
+            };
 
             this.update();
             this.runContinuously();
@@ -51,12 +57,19 @@ class App {
         }
     }
 
-    async update(print=true) {
-        let promises = [this.onchainArbi.updatePositionsAndIds()];//, this.onchain.updatePositionsAndIds()];
+    async update(print=true, chain = 0) {
+        let promises;
+        if(chain == 42161) {
+            promises = [this.onchainArbi.updatePositionsAndIds()];
+        } else if(chain == 137) {
+            promises = [this.onchain.updatePositionsAndIds()];
+        } else {
+            promises = [this.onchainArbi.updatePositionsAndIds(), this.onchain.updatePositionsAndIds()];
+        }
 
         Promise.all(promises).then(() => {
-            this.openPositions = this.onchainArbi.allTrades;//.concat(this.onchainArbi.allTrades);
-            if(print) console.log("Number of open trades on Arbi:",this.onchainArbi.allTrades.length);//, "\nNumber of open trades on Arbitrum:", this.onchainArbi.allTrades.length);
+            this.openPositions = this.onchain.allTrades.concat(this.onchainArbi.allTrades);
+            if(print) console.log("Number of open trades on Polygon:",this.onchain.allTrades.length + "\nNumber of open trades on Arbitrum:", this.onchainArbi.allTrades.length);
             else console.log("Positions updated.");
         });
     }
@@ -75,7 +88,7 @@ class App {
         let prices = data.prices;
         let sigData = data.data;
 
-        for(let i=0; i<this.openPositions.length; i++) { //this.openPositions.length
+        for(let i=0; i<this.openPositions.length; i++) {
             if(this.triggered[this.openPositions[i].network].includes(this.openPositions[i].id)) continue;
 
             const asset = this.openPositions[i].asset;
@@ -134,10 +147,10 @@ class App {
     }
 
     async handleTrigger(trade, data, type) {
-        if(trade.network == 0) {
+        if(trade.network == 42161) {
             this.triggerArbi.trig(type, trade.id, data);
-        } else if(trade.network == 1) {
-            this.triggerArbi.trig(type, trade.id, data);
+        } else if(trade.network == 137) {
+            this.trigger.trig(type, trade.id, data);
         }
     }
 }

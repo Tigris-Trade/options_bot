@@ -12,12 +12,12 @@ export default class Trigger {
         this.walletAddress = wallet; 
 
         this.nonce = -1;
-        this.gasAmount = 1000000;
+        this.gasAmount = 10000000;
 
-        if(network == 0) {
+        if(network == 137) {
             this.gasPrice = 500 * 1000000000;
         } else {
-            this.gasPrice = 500 * 1000000000;
+            this.gasPrice = 0.1 * 1000000000;
         }
 
         this.init(network);
@@ -52,10 +52,10 @@ export default class Trigger {
     }
 
     async init(network) {
-        if(network == 0) {
-            this.optionsAddress = "0x72cCBECE3F4cB0aF63865240F240496BC5E4351d";
+        if(network == 137) {
+            this.optionsAddress = "0x28969DeD75cf3BCe9f2b6bd49ac92D8Ba8dfc3D1";
         } else {
-            this.optionsAddress = "0x72cCBECE3F4cB0aF63865240F240496BC5E4351d";
+            this.optionsAddress = "0xc6d1ba6363fFe4FDdA9FFbEa8d91974De9775331";
         }
 
         this.optionsContract = new ethers.Contract(this.optionsAddress, this.optionsABI, this.signer);
