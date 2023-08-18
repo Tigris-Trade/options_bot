@@ -12,7 +12,7 @@ export default class Onchain {
         const web3 = new Web3(new Web3.providers.HttpProvider(provider));
 
         this.tradenftContract = new web3.eth.Contract(tradenftABI, this.tradenftAddress);
-        this.numberOfAssets = 40;
+        this.numberOfAssets = 45;
     }
 
     async updatePositionsAndIds() {
