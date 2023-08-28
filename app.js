@@ -106,7 +106,14 @@ class App {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
                     console.log("triggering old #"+this.openPositions[i].id);
-                    const xoldSig = await axios.get(`https://db.tigrisoracle.net/pair/${asset}/${(expires/1)+1}`);
+                    let xoldSig;
+                    
+                    try {
+                        xoldSig = await axios.get(`https://db.tigrisoracle.net/pair/${asset}/${(expires/1)+1}`);
+                    } catch(e) {
+                        continue;
+                    }
+
                     const oldSig = xoldSig.data;
 
                     const sig = {
