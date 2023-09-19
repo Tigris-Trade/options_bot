@@ -13,11 +13,11 @@ class App {
             this.numberOfAssets = 45;
             this.oraclePrices = new COraclePrices(this.numberOfAssets);
             
-            this.onchain = new Onchain(process.env.PROVIDER_ARBI /* env on server is for polygon*/, 137, this.numberOfAssets);
-            this.onchainArbi = new Onchain("https://arb1.arbitrum.io/rpc", 42161, this.numberOfAssets);
+            this.onchain = new Onchain(process.env.POLYGON_PROVIDER ?? "https://polygon-rpc.com", 137, this.numberOfAssets);
+            this.onchainArbi = new Onchain(process.env.ARB_PROVIDER ?? "https://arb1.arbitrum.io/rpc", 42161, this.numberOfAssets);
 
-            this.trigger = new Trigger(process.env.PROVIDER_ARBI /* env on server is for polygon*/, 137, process.env.WALLET, process.env.PRIV_KEY);
-            this.triggerArbi = new Trigger("https://arb1.arbitrum.io/rpc", 42161, process.env.WALLET, process.env.PRIV_KEY);
+            this.trigger = new Trigger(process.env.POLYGON_PROVIDER ?? "https://polygon-rpc.com", 137, process.env.WALLET, process.env.PRIV_KEY);
+            this.triggerArbi = new Trigger(process.env.ARB_PROVIDER ?? "https://arb1.arbitrum.io/rpc", 42161, process.env.WALLET, process.env.PRIV_KEY);
 
             const socket = socketio(new Date().getTimezoneOffset() < -120 ? 'https://us1events.tigristrade.info' : 'https://eu1events.tigristrade.info', { transports: ['websocket'] });
 
@@ -111,14 +111,12 @@ class App {
                 const timeNow = sigData[asset].price[5];
                 const expires = this.openPositions[i].expires;
 
-                console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires + 10 ? "Old" : timeNow >= expires ? "Normal" : "Not yet");
-
                 if(expires < 1691752121 || expires == 1691753171) {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
                 } else if(timeNow >= expires + 10) {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
-                    console.log("triggering old #"+this.openPositions[i].id);
+                    console.log("Triggering old #"+this.openPositions[i].id);
                     let xoldSig;
                     
                     try {
@@ -146,9 +144,12 @@ class App {
                 } else if(timeNow >= expires) {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
-                    console.log("triggering #"+this.openPositions[i].id);
+                    console.log("Triggering #"+this.openPositions[i].id);
                     this.handleTrigger(this.openPositions[i], sigData[asset], 0);
                     break;
+                } else {
+                    // log
+                    console.log("#"+this.openPositions[i].id, timeNow, expires, timeNow >= expires + 10 ? "Old" : timeNow >= expires ? "Normal" : "Not yet");
                 }
             } else if(this.openPositions[i].orderType == 1) {
                 const openPrice = this.openPositions[i].openPrice;
@@ -159,7 +160,7 @@ class App {
                 if((isLong && openPrice >= currentPrice) || (!isLong && openPrice <= currentPrice)) {
                     this.triggered[this.openPositions[i].network].push(this.openPositions[i].id);
 
-                    console.log("triggering limit #"+this.openPositions[i].id);
+                    console.log("Triggering limit #"+this.openPositions[i].id);
                     this.handleTrigger(this.openPositions[i], sigData[asset], 1);
                 } 
             }

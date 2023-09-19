@@ -25,7 +25,7 @@ export default class Trigger {
 
     async trig(type, nftId, data) {
 
-        console.log(type, "trigging....");
+        console.log(type, "Triggering...");
         if(type == 0) {
             await this.closeTrade(nftId, data);
         } else if(type == 1) {
