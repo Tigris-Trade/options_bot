@@ -30,6 +30,8 @@ export default class Trigger {
             await this.closeTrade(nftId, data);
         } else if(type == 1) {
             await this.executeLimit(nftId, data);
+        } else if(type == 2) { // finalize trade
+            await this.confirmOpenOrder(nftId, data);
         }
     }
 
@@ -51,11 +53,20 @@ export default class Trigger {
         }
     }
 
+    async confirmOpenOrder(id, data) {
+        try {
+            await this.optionsContract.confirmOpenOrder(id, data.price, data.sig, true, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
+        } catch(error) {
+            console.log("confirm catch");
+            console.log(error);
+        }
+    }
+
     async init(network) {
         if(network == 137) {
-            this.optionsAddress = "0x28969DeD75cf3BCe9f2b6bd49ac92D8Ba8dfc3D1";
+            this.optionsAddress = "0x87e0df5aC8a657af9F1472995354A09a4F9C381a";
         } else {
-            this.optionsAddress = "0xc6d1ba6363fFe4FDdA9FFbEa8d91974De9775331";
+            this.optionsAddress = "0x98125e58bc966894167c536652d7648f6BEEbF05";
         }
 
         this.optionsContract = new ethers.Contract(this.optionsAddress, this.optionsABI, this.signer);

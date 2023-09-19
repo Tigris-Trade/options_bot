@@ -42,6 +42,19 @@ class App {
                 this.update(false, data.chainId);
             });
 
+            socket.on('OpenOrderCreated', async (data) => {
+                setTimeout(async ()=> {
+                    let p_data = await this.oraclePrices.getPrices();
+                    let sigData = p_data.data;
+
+                    if(data.chainId == 42161) {
+                        this.triggerArbi.trig(2, data.order.id, sigData[data.order.tradeInfo.asset]);
+                    } else if(data.chainId == 137) {
+                        this.trigger.trig(2, data.order.id, sigData[data.order.tradeInfo.asset]);
+                    }
+                }, 1000);
+            });
+
             this.openPositions = [];
             this.triggered = {
                 137: [], 
