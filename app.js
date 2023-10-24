@@ -34,11 +34,11 @@ class App {
                 this.update(false, data.chainId);
             });
 
-            socket.on('LimitOrderExecuted', (data) => {
+            socket.on('OptionsLimitOrderExecuted', (data) => {
                 this.update(false, data.chainId);
             });
 
-            socket.on('LimitCancelled', (data) => {
+            socket.on('OptionsLimitCancelled', (data) => {
                 this.update(false, data.chainId);
             });
 
