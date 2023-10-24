@@ -30,14 +30,12 @@ export default class Trigger {
             await this.closeTrade(nftId, data);
         } else if(type == 1) {
             await this.executeLimit(nftId, data);
-        } else if(type == 2) { // finalize trade
-            await this.confirmOpenOrder(nftId, data);
         }
     }
 
     async closeTrade(id, data) {
         try {
-            await this.optionsContract.closeTrade(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
+            await this.optionsContract.closeTrade(id, data, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
         } catch(error) {
             console.log("close catch");
             console.log(error);
@@ -46,27 +44,18 @@ export default class Trigger {
 
     async executeLimit(id, data) {
         try {
-            await this.optionsContract.executeLimitOrder(id, data.price, data.sig, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
+            await this.optionsContract.executeLimitOrder(id, data, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
         } catch(error) {
             console.log("execute catch");
             console.log(error);
         }
     }
 
-    async confirmOpenOrder(id, data) {
-        try {
-            await this.optionsContract.confirmOpenOrder(id, data.price, data.sig, true, {gasPrice: this.gasPrice, gasLimit: this.gasAmount, nonce: this.nonce++})
-        } catch(error) {
-            console.log("confirm catch");
-            console.log(error);
-        }
-    }
-
     async init(network) {
         if(network == 137) {
-            this.optionsAddress = "0x87e0df5aC8a657af9F1472995354A09a4F9C381a";
+            this.optionsAddress = "0xFeABeC2CaC8A1A2f1C0c181572aA88c8b91288B2";
         } else {
-            this.optionsAddress = "0x98125e58bc966894167c536652d7648f6BEEbF05";
+            this.optionsAddress = "0x8895b0B946b3d5bCd7D1E9E31DCfaeB51644922A";
         }
 
         this.optionsContract = new ethers.Contract(this.optionsAddress, this.optionsABI, this.signer);

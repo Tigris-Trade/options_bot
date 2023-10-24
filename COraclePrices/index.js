@@ -39,15 +39,16 @@ export default class Oracle {
                 data?.asset,
                 data?.price,
                 data?.spread,
-                data?.timestamp
+                data?.timestamp,
+                data?.signature
             ];
 
-            allData.push({price: priceData, sig: data?.signature});
+            allData.push(priceData);
         }
 
         return {
             prices: prices,
-            data: allData // [{price: [], sig: "0xsig"}, {price: [], sig: "0xsig"}, {price: [], sig: "0xsig"}]
+            data: allData
         };
     }
 }
