@@ -95,7 +95,7 @@ class App {
             if(!sigData[asset]) continue;
 
             if(this.openPositions[i].orderType == 0) {
-                const timeNow = sigData[asset].price[5];
+                const timeNow = sigData[asset][5];
                 const expires = this.openPositions[i].expires;
 
                 if(expires < 1691752121 || expires == 1691753171) {
@@ -114,17 +114,15 @@ class App {
 
                     const oldSig = xoldSig.data;
 
-                    const sig = {
-                        price: [
+                    const sig = [
                             oldSig.provider,
                             oldSig.is_closed,
                             oldSig.asset,
                             oldSig.price,
                             oldSig.spread,
-                            oldSig.timestamp
-                        ],
-                        sig: oldSig.signature
-                    }
+                            oldSig.timestamp,
+                            oldSig.signature
+                        ];
                     
                     this.handleTrigger(this.openPositions[i], sig, 0);
                     break;
