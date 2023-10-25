@@ -34,25 +34,12 @@ class App {
                 this.update(false, data.chainId);
             });
 
-            socket.on('LimitOrderExecuted', (data) => {
+            socket.on('OptionsLimitOrderExecuted', (data) => {
                 this.update(false, data.chainId);
             });
 
-            socket.on('LimitCancelled', (data) => {
+            socket.on('OptionsLimitCancelled', (data) => {
                 this.update(false, data.chainId);
-            });
-
-            socket.on('OpenOrderCreated', async (data) => {
-                setTimeout(async ()=> {
-                    let p_data = await this.oraclePrices.getPrices();
-                    let sigData = p_data.data;
-
-                    if(data.chainId == 42161) {
-                        this.triggerArbi.trig(2, data.order.id, sigData[data.order.tradeInfo.asset]);
-                    } else if(data.chainId == 137) {
-                        this.trigger.trig(2, data.order.id, sigData[data.order.tradeInfo.asset]);
-                    }
-                }, 1000);
             });
 
             this.openPositions = [];
@@ -108,7 +95,7 @@ class App {
             if(!sigData[asset]) continue;
 
             if(this.openPositions[i].orderType == 0) {
-                const timeNow = sigData[asset].price[5];
+                const timeNow = sigData[asset][5];
                 const expires = this.openPositions[i].expires;
 
                 if(expires < 1691752121 || expires == 1691753171) {
@@ -127,17 +114,15 @@ class App {
 
                     const oldSig = xoldSig.data;
 
-                    const sig = {
-                        price: [
+                    const sig = [
                             oldSig.provider,
                             oldSig.is_closed,
                             oldSig.asset,
                             oldSig.price,
                             oldSig.spread,
-                            oldSig.timestamp
-                        ],
-                        sig: oldSig.signature
-                    }
+                            oldSig.timestamp,
+                            oldSig.signature
+                        ];
                     
                     this.handleTrigger(this.openPositions[i], sig, 0);
                     break;

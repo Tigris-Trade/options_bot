@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 export default class Oracle {
 
     constructor(_numberOfAssets) {
-        const socket = io.connect("wss://eu1.tigrisoracle.net", { transports: ['websocket'] });
+        const socket = io.connect(new Date().getTimezoneOffset() < -120 ? 'https://us1.tigrisoracle.net' : 'https://eu1.tigrisoracle.net', { transports: ['websocket'] });
 
         socket.on('connect', () => {
             console.log('Connected to Tigris Oracle');
@@ -39,15 +39,16 @@ export default class Oracle {
                 data?.asset,
                 data?.price,
                 data?.spread,
-                data?.timestamp
+                data?.timestamp,
+                data?.signature
             ];
 
-            allData.push({price: priceData, sig: data?.signature});
+            allData.push(priceData);
         }
 
         return {
             prices: prices,
-            data: allData // [{price: [], sig: "0xsig"}, {price: [], sig: "0xsig"}, {price: [], sig: "0xsig"}]
+            data: allData
         };
     }
 }
