@@ -19,7 +19,7 @@ class App {
             this.trigger = new Trigger(process.env.POLYGON_PROVIDER ?? "https://polygon-rpc.com", 137, process.env.WALLET, process.env.PRIV_KEY);
             this.triggerArbi = new Trigger(process.env.ARB_PROVIDER ?? "https://arb1.arbitrum.io/rpc", 42161, process.env.WALLET, process.env.PRIV_KEY);
 
-            const socket = socketio('https://beta-events-a43k8.ondigitalocean.app', { transports: ['websocket'] });
+            const socket = socketio(new Date().getTimezoneOffset() < -120 ? 'https://us1events.tigristrade.info' : 'https://eu1events.tigristrade.info', { transports: ['websocket'] });
 
             socket.on('error', (error) => {
                 console.log('Events Socket Error:', error);
